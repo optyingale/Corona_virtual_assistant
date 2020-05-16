@@ -6,13 +6,16 @@ import re
 import json
 import speech_recognition as sr
 import pyttsx3
+import warnings
+
+warnings.filterwarnings("ignore")
 
 def speak(text):
     engine = pyttsx3.init()
     engine.say(text)
     engine.runAndWait()
     return text
-speak('Speak method is now defined')
+
 
 def get_audio():
     r = sr.Recognizer()
@@ -26,6 +29,7 @@ def get_audio():
             print(str(e))
     return said.lower()
 
+speak('Scraping table')
 def scrape_table(url):
     # Creating soup for each source
     soup = BeautifulSoup(requests.get(url).content, 'lxml')
@@ -48,6 +52,7 @@ def scrape_table(url):
     
     return df
 
+speak('cleaning the data')
 def clean_data(df):
     
     # Checking for which dataframe is recieved 
@@ -176,15 +181,15 @@ def query_df(text):
 def query_col(text):
     india_column_patterns = {re.compile("[\w\s]+ cases [\w\s]+") : temp_df.columns[1],
                              re.compile("[\w\s]+ recovered [\w\s]+") : temp_df.columns[2],
-                             re.compile("[\w\s]+ deaths [\w\s]+") : temp_df.columns[3],
+                             re.compile("[\w\s]+ death|deaths [\w\s]+") : temp_df.columns[3],
                              re.compile("[\w\s]+ recovery rate [\w\s]+") : temp_df.columns[4],
-                             re.compile("[\w\s]+ tests [\w\s]+") : temp_df.columns[7],
+                             re.compile("[\w\s]+ test|tests|testing [\w\s]+") : temp_df.columns[7],
                              re.compile("[\w\s]+ positive rate [\w\s]+") : temp_df.columns[8],}
     world_column_patterns = {re.compile("[\w\s]+ cases [\w\s]+") : temp_df1.columns[1],
                              re.compile("[\w\s]+ recovered [\w\s]+") : temp_df1.columns[5],
-                             re.compile("[\w\s]+ deaths [\w\s]+") : temp_df1.columns[3],
+                             re.compile("[\w\s]+ death|deaths [\w\s]+") : temp_df1.columns[3],
                              re.compile("[\w\s]+ recovery rate [\w\s]+") : temp_df1.columns[8],
-                             re.compile("[\w\s]+ tests [\w\s]+") : temp_df1.columns[7],
+                             re.compile("[\w\s]+ test|tests|testing [\w\s]+") : temp_df1.columns[7],
                              re.compile("[\w\s]+ positive rate [\w\s]+") : temp_df1.columns[9],}
     india_state = temp_df[temp_df.columns[0]].str.lower().values
     col = []
@@ -209,16 +214,19 @@ end_phrase = 'stop'
 while True:
     print('Listning')
     text = get_audio()
-    result = None
-    #text = 'give me recovered in maharashtra'
     print(text)
-    if result:
+    if text:
         try:
+            if text.find(end_phrase) != -1:  # stop loop
+                print("Exit")
+                speak('The pleasure was mine')
+                break
+            #print(query_df(text))
+            query_result = query_df(text)[query_col(text)].values
+            speak(query_result)
+            print(query_result)
             print(query_df(text))
-            speak(query_df(text)[query_col(text)].values)
         except Exception as e:
             speak(str(e))
             print(str(e))
-    if text.find(end_phrase) != -1:  # stop loop
-        print("Exit")
-        break
+        
