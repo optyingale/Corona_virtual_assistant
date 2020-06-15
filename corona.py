@@ -30,6 +30,7 @@ def get_audio():
     return said.lower()
 
 speak('Scraping table')
+print('Scraping table')
 def scrape_table(url):
     # Creating soup for each source
     soup = BeautifulSoup(requests.get(url).content, 'lxml')
@@ -53,6 +54,7 @@ def scrape_table(url):
     return df
 
 speak('cleaning the data')
+print('cleaning the data')
 def clean_data(df):
     
     # Checking for which dataframe is recieved 
@@ -208,6 +210,7 @@ def query_col(text):
 
 speak('ask me any stat about coronavirus for either country or state')
 speak('to terminate this app you must say stop')
+print('You may now speak')
 
 end_phrase = 'stop'
 
@@ -229,4 +232,3 @@ while True:
         except Exception as e:
             speak(str(e))
             print(str(e))
-        
